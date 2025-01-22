@@ -1,0 +1,11 @@
+<RCC>
+    <qresource prefix="/MainWidget">
+        <file>Resources/title/close.svg</file>
+        <file>Resources/title/close_hover.svg</file>
+        <file>Resources/title/icon.png</file>
+        <file>Resources/title/max.svg</file>
+        <file>Resources/title/max_hover.svg</file>
+        <file>Resources/title/min.svg</file>
+        <file>Resources/title/min_hover.svg</file>
+    </qresource>
+</RCC>
