@@ -26,6 +26,7 @@ private slots :
 signals :
 	void sign_bottom_click(int value);
 private:
+	QPushButton* m_pRtmpBtn;
 	QPushButton* m_pStopBtn;
 	QPushButton* m_pUpBtn;
 	QPushButton* m_pPlayBtn;

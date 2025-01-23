@@ -111,7 +111,27 @@ int CvlcPlayKits::play(QString filename, void *drawable) {
 	pause = false;
 	return 0;
 }
+int CvlcPlayKits::playRtmp(QString filename, void *drawable) {
+	vlc_media = libvlc_media_new_location(vlc_base, filename.toUtf8());
+	if (!vlc_media)
+	{
+		return -1;
+	}
+	libvlc_media_parse(vlc_media);
+	//libvlc_media_player_stop(vlc_mediaPlayer);
+	libvlc_media_player_set_media(vlc_mediaPlayer, vlc_media);
+	libvlc_media_player_set_hwnd(vlc_mediaPlayer, drawable);
+	libvlc_media_player_set_rate(vlc_mediaPlayer, 1.0);
+	m_totalSecs = libvlc_media_get_duration(vlc_media) / 1000;
 
+	libvlc_media_release(vlc_media);
+	vlc_media = nullptr;
+
+	if (vlc_mediaPlayer)libvlc_media_player_play(vlc_mediaPlayer);
+	setVideoPlayButtonContent(QStringLiteral("ÔÝÍ£"));
+	pause = false;
+	return 0;
+}
 int CvlcPlayKits::play(QStringList fileList, void *drawable) {
 	 m_pMediaPlayerList = libvlc_media_list_player_new(vlc_base);
 	 m_medialist = libvlc_media_list_new(vlc_base);
@@ -219,6 +239,10 @@ CvlcPlayKits::~CvlcPlayKits()
 	}
 	if (vlc_mediaPlayer)
 	{
+		if (libvlc_media_player_is_playing(vlc_mediaPlayer))
+		{
+			libvlc_media_player_stop(vlc_mediaPlayer);
+		}
 		libvlc_media_player_release(vlc_mediaPlayer);
 		vlc_mediaPlayer = nullptr;
 	}

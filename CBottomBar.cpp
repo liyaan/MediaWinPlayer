@@ -27,6 +27,10 @@ void CBottomBar::initUI() {
 	
 	
 //	pBVMlay->addLayout(pBProTime);
+	m_pRtmpBtn = new QPushButton(this);
+	m_pRtmpBtn->setFixedSize(60, 25);
+	m_pRtmpBtn->setText(u8"ÍøÂçÊÓÆµ");
+	m_pRtmpBtn->setStyleSheet("QPushButton{color:#ffffff;padding-top:2px;padding-bottom:2px;font-size:10px;}");
 
 	m_pStopBtn = new QPushButton(this);
 	buttonStyle(m_pStopBtn,u8"Í£Ö¹");
@@ -50,6 +54,7 @@ void CBottomBar::initUI() {
 
 	QHBoxLayout *pBHMlay = new QHBoxLayout(this);
 	QHBoxLayout *pHlay = new QHBoxLayout(this);
+	pHlay->addWidget(m_pRtmpBtn);
 	pHlay->addStretch();
 	pHlay->addWidget(m_pStopBtn);
 	pHlay->addWidget(m_pUpBtn);
@@ -78,7 +83,7 @@ void CBottomBar::initUI() {
 	pHRlay->setContentsMargins(0, 0, 20, 0);
 	pBHMlay->addLayout(pHRlay);
 	pBVMlay->addLayout(pBHMlay);
-
+	connect(m_pRtmpBtn, &QPushButton::clicked, this, &CBottomBar::onClicked);
 	connect(m_pStopBtn, &QPushButton::clicked, this, &CBottomBar::onClicked);
 	connect(m_pUpBtn, &QPushButton::clicked, this, &CBottomBar::onClicked);
 	connect(m_pPlayBtn, &QPushButton::clicked, this, &CBottomBar::onClicked);
@@ -147,6 +152,9 @@ void CBottomBar::onClicked() {
 	}
 	else if (pButton == m_pAllScreenBtn) {
 		emit sign_bottom_click(7);
+	}
+	else if (pButton == m_pRtmpBtn) {
+		emit sign_bottom_click(8);
 	}
 }
 CBottomBar::~CBottomBar()

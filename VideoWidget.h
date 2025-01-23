@@ -17,13 +17,14 @@
 #include "QSqlData.h"
 #include "CrightPlayListWidght.h"
 #include "CBottomBar.h"
+#include "CLiftRtmpListWidght.h"
 #include "Utils.h"
 class VideoWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	VideoWidget(CvlcPlayKits* clv, QSqlData* qSqlData, CrightPlayListWidght* crightPlayListWidght, CBottomBar* cBottomBar,QWidget *parent = nullptr);
+	VideoWidget(CvlcPlayKits* clv, QSqlData* qSqlData, CrightPlayListWidght* crightPlayListWidght, CBottomBar* cBottomBar, CLiftRtmpListWidght* cLiftRtmpListWidght,QWidget *parent = nullptr);
 	~VideoWidget();
 	void resizeEvent(QResizeEvent *event) override;
 	void setTimeSliderPos(int value);
@@ -36,6 +37,7 @@ private slots:
 	void ProgressSliderMove(int);
 	void VideoTimeProgress(float);
 	void onRightItemClick(QString path);
+	void onLeftItemClick(QString path);
 	void signBottomClick(int);
 private:
 	QWidget* m_pVideoWidget = nullptr;
@@ -50,6 +52,7 @@ private:
 	QString selectName = nullptr;
 	Utils* m_Utils = nullptr;
 	QListWidget* listWidght = nullptr;
+	CLiftRtmpListWidght* m_pCLiftRtmpListWidght = nullptr;
 private slots:
 	
 signals:

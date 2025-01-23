@@ -26,6 +26,7 @@ public:
 	int getVecIndex();
 	int play(QString fileName, void *drawable);
 	int play(QStringList fileList, void *drawable);
+	int playRtmp(QString fileName, void *drawable);
 	void play();
 	void stop();
 	void pauseMethod();

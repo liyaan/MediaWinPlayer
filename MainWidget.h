@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include "CFrameLessWidgetBase.h"
 #include "CrightPlayListWidght.h"
+#include "CLiftRtmpListWidght.h"
 #include <memory>
 using namespace std;
 class MainWidget : public CFrameLessWidgetBase
@@ -31,5 +32,6 @@ private:
 	CBottomBar* m_pBottomBar = nullptr;
 	std::unique_ptr<CvlcPlayKits> m_Pvlc;
 	QSqlData* m_QSqlData = nullptr;
+	CLiftRtmpListWidght* m_pCLiftRtmpListWidght = nullptr;
 	
 };

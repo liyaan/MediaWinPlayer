@@ -19,7 +19,7 @@ void CALLBACK TimeProc(HWND hwnd, UINT msg, UINT_PTR id, DWORD time) {
 	}
 }
 
-VideoWidget::VideoWidget(CvlcPlayKits* clv, QSqlData* qSqlData, CrightPlayListWidght* crightPlayListWidght, CBottomBar* cBottomBar, QWidget *parent)
+VideoWidget::VideoWidget(CvlcPlayKits* clv, QSqlData* qSqlData, CrightPlayListWidght* crightPlayListWidght, CBottomBar* cBottomBar, CLiftRtmpListWidght* cLiftRtmpListWidght, QWidget *parent)
 	: QWidget(parent)
 {
 	setAttribute(Qt::WA_StyledBackground);
@@ -27,6 +27,7 @@ VideoWidget::VideoWidget(CvlcPlayKits* clv, QSqlData* qSqlData, CrightPlayListWi
 	m_CrightPlayListWidght = crightPlayListWidght;
 	m_CBottomBar = cBottomBar;
 	m_qSqlData = qSqlData;
+	m_pCLiftRtmpListWidght = cLiftRtmpListWidght;
 	m_Utils = new Utils();
 	initUI();
 	initConnect();
@@ -108,7 +109,7 @@ void VideoWidget::initConnect() {
 
 	connect(m_Pvlc, &CvlcPlayKits::sign_VideoTimeProgress, this, &VideoWidget::VideoTimeProgress);
 	connect(m_CrightPlayListWidght, &CrightPlayListWidght::onSignItemClick, this, &VideoWidget::onRightItemClick);
-
+	connect(m_pCLiftRtmpListWidght, &CLiftRtmpListWidght::onSignItemClick, this, &VideoWidget::onLeftItemClick);
 	connect(m_CBottomBar, &CBottomBar::sign_bottom_click, this, &VideoWidget::signBottomClick);
 }
 void VideoWidget::onRightItemClick(QString name) {
@@ -127,6 +128,23 @@ void VideoWidget::onRightItemClick(QString name) {
 			m_CrightPlayListWidght->setSelectedItemText(selectName);
 		}
 		
+	}
+	SetTimer(NULL, 1, 300, TimeProc);
+}
+void VideoWidget::onLeftItemClick(QString path) {
+	if (m_Pvlc && !path.isEmpty())
+	{
+		m_pSelectVideo->hide();
+		int type = m_Pvlc->playRtmp(path, (void*)m_pVideoWidget->winId());
+		if (type != 0)
+		{
+			QMessageBox::information(this, "Ã· æ", "≤•∑≈ ß∞‹");
+			return;
+		}
+		else if (type == 0) {
+			
+		}
+
 	}
 	SetTimer(NULL, 1, 300, TimeProc);
 }
