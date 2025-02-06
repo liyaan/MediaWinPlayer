@@ -38,7 +38,6 @@ void VideoWidget::initUI() {
 	this->setStyleSheet("background-color:rgb(17,17,17)");
 	
 
-	
 	m_pVideoWidget = new QWidget(this);
 	m_pVideoWidget->resize(width(), height());
 	
@@ -56,7 +55,7 @@ void VideoWidget::initUI() {
             border: 1px solid #999999;
             height: 8px;
             background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                        stop:0 #B1B1B1, stop:1 #c4c4c4);
+                                        stop:0 #B9B9B9, stop:1 #c4c4c4);
             margin: 2px 0;
         }
         QSlider::handle:horizontal {
@@ -67,8 +66,15 @@ void VideoWidget::initUI() {
             margin: -2px 0;
         }
         QSlider {
-            width: 200px;  // 自定义宽度
+            width: 200px;  
         }
+		QSlider::add-page:horizontal {
+                  background: #aaaaaa;
+             }
+		QSlider::sub-page:Horizontal
+		{
+		background-color:rgb(54,54,112);
+		}
     )");
 	m_QLabel = new QLabel(this);
 	m_QLabel->setText("00:00:00/00:00:00");
@@ -90,6 +96,7 @@ void VideoWidget::resizeEvent(QResizeEvent* event){
 		m_pSelectVideo->move(x1, y1);
 		m_pVideoWidget->resize(this->width(), this->height());
 	}
+
 	if (pBProTime && m_QProgressBar) {
 		pBProTime->setContentsMargins(10, this->height()-28, 10, 0);
 		m_QProgressBar->setFixedWidth(this->width() - 180);
@@ -111,6 +118,9 @@ void VideoWidget::initConnect() {
 	connect(m_CrightPlayListWidght, &CrightPlayListWidght::onSignItemClick, this, &VideoWidget::onRightItemClick);
 	connect(m_pCLiftRtmpListWidght, &CLiftRtmpListWidght::onSignItemClick, this, &VideoWidget::onLeftItemClick);
 	connect(m_CBottomBar, &CBottomBar::sign_bottom_click, this, &VideoWidget::signBottomClick);
+
+	connect(m_Pvlc, &CvlcPlayKits::sign_YsQPixmap, this, &VideoWidget::signYsQPixmap);
+	connect(m_Pvlc, &CvlcPlayKits::sign_ClYsQPixmap, this, &VideoWidget::signClYsQPixmap);
 }
 void VideoWidget::onRightItemClick(QString name) {
 	QString path = m_qSqlData->readData(name);
@@ -119,7 +129,7 @@ void VideoWidget::onRightItemClick(QString name) {
 		int type = m_Pvlc->play(path, (void*)m_pVideoWidget->winId());
 		if (type != 0)
 		{
-			QMessageBox::information(this, "提示", "播放失败");
+			QMessageBox::information(this, u8"提示", u8"播放失败");
 			return;
 		}
 		else if (type == 0) {
@@ -138,7 +148,7 @@ void VideoWidget::onLeftItemClick(QString path) {
 		int type = m_Pvlc->playRtmp(path, (void*)m_pVideoWidget->winId());
 		if (type != 0)
 		{
-			QMessageBox::information(this, "提示", "播放失败");
+			QMessageBox::information(this, u8"提示", u8"播放失败");
 			return;
 		}
 		else if (type == 0) {
@@ -201,7 +211,7 @@ void VideoWidget::signBottomClick(int value) {
 	
 }
 void VideoWidget::onClicked() {
-	QStringList filenames = QFileDialog::getOpenFileNames(this, "选择打开的文件", "D:/", tr("*.*"));
+	QStringList filenames = QFileDialog::getOpenFileNames(this, u8"选择打开的文件", ":", tr("*.*"));
 	if (filenames.size() == 1) {
 		QString filename = filenames[0];
 		std::replace(filename.begin(), filename.end(), QChar('/'), QChar('\\'));
@@ -211,7 +221,7 @@ void VideoWidget::onClicked() {
 			int type = m_Pvlc->play(filename, (void*)m_pVideoWidget->winId());
 			if (type != 0)
 			{
-				QMessageBox::information(this, "提示", "播放失败");
+				QMessageBox::information(this, u8"提示", u8"播放失败");
 				return;
 			}
 			else if (type == 0) {
@@ -235,14 +245,22 @@ void VideoWidget::onClicked() {
 		{
 			if (m_Pvlc->play(filenames, (void*)m_pVideoWidget->winId()) != 0)
 			{
-				QMessageBox::information(this, "提示", "播放失败");
+				QMessageBox::information(this, u8"提示", u8"播放失败");
 				return;
 			}
-			m_pSelectVideo->hide();
+			if (filenames.size()>1)
+			{
+				m_pSelectVideo->hide();
+			}
+			
 		}
 	}
 	
 	SetTimer(NULL, 1, 300, TimeProc);
-		
-
+}
+void VideoWidget::signYsQPixmap(QPixmap value) {
+	m_QYImage->setPixmap(value);
+}
+void VideoWidget::signClYsQPixmap(QPixmap value) {
+	m_QYcImage->setPixmap(value);
 }

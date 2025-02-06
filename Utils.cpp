@@ -12,8 +12,17 @@ QString Utils::baseName(QString fileName) {
 QString Utils::absolutePath(QString fileName) {
 	QFileInfo fileInfo(fileName);
 	QString justFilePath = fileInfo.absolutePath();
+	selectPath = fileInfo.filePath();
 	return justFilePath;
 }
+QString Utils::getSelectPath() {
+	if (selectPath.isEmpty())
+	{
+		selectPath = 'C:';
+	}
+	return selectPath;
+}
+
 Utils::~Utils()
 {
 }

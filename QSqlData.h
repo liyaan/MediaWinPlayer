@@ -19,6 +19,7 @@ public:
 	QString readData(QString name);
 	bool readDataFile(QString filePath, QString fileName);
 	QStringList readDataList();
+	bool clearDataList();
 	void close();
 private:
 	void initSql();

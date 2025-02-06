@@ -14,13 +14,22 @@ CrightPlayListWidght::CrightPlayListWidght(CvlcPlayKits* clv, QSqlData* qSqlData
 }
 void CrightPlayListWidght::initUI() {
 	QVBoxLayout* pVlay = new  QVBoxLayout(this);
+	QHBoxLayout* pHlay = new QHBoxLayout(this);
 	pVlay->setContentsMargins(0, 0, 0, 0);
+	pHlay->setContentsMargins(0, 0, 0, 0);
+
 	m_pSelectVideo = new QPushButton(this);
 	m_pSelectVideo->setFixedHeight(40);
 	m_pSelectVideo->setText(u8"添加视频");
 	m_pSelectVideo->setStyleSheet("QPushButton{color:#ffffff;padding-top:2px;padding-bottom:2px;font-size:18px;border-radius: 20px;} QPushButton:hover{border-radius: 20px;}");
+	
+	m_pClearVideo = new QPushButton(this);
+	m_pClearVideo->setFixedHeight(40);
+	m_pClearVideo->setText(u8"清除视频");
+	m_pClearVideo->setStyleSheet("QPushButton{color:#ffffff;padding-top:2px;padding-bottom:2px;font-size:18px;border-radius: 20px;} QPushButton:hover{border-radius: 20px;}");
+	
 	m_qListWidget = new QListWidget(this);
-	m_qListWidget->setFixedWidth(300);
+	m_qListWidget->setFixedWidth(295);
 
 	QString styleSheet = R"(
         QListWidget {
@@ -95,24 +104,45 @@ void CrightPlayListWidght::initUI() {
 		)";
 	horizontalScrollBar->setStyleSheet(styleScrollHSheet);
 	verticalScrollBar->setStyleSheet(styleScrollHSheet);
-	pVlay->addWidget(m_pSelectVideo);
+	pHlay->addWidget(m_pSelectVideo);
+	pHlay->addWidget(m_pClearVideo);
+	pVlay->addLayout(pHlay);
 	pVlay->addWidget(m_qListWidget);
 	
 }
 void CrightPlayListWidght::initConnect() {
 	connect(m_pSelectVideo, &QPushButton::clicked, this, &CrightPlayListWidght::onClickSelectVideo);
+	connect(m_pClearVideo, &QPushButton::clicked, this, &CrightPlayListWidght::onClickSelectVideo);
+
 	connect(m_qListWidget, &QListWidget::itemClicked,this, &CrightPlayListWidght::onItemClick);
 }
 void CrightPlayListWidght::onClickSelectVideo() {
-	QString filename = QFileDialog::getOpenFileName(this, "选择打开的文件", "D:/", tr("*.*"));
+	QPushButton* pButton = qobject_cast<QPushButton*>(sender());
+	if (pButton == m_pClearVideo)
+	{
+		if (m_qSqlData->clearDataList())
+		{
+			if (m_qListWidget) {
+				m_qListWidget->clear();
+			}
+		}
+		return;
+	}
+	QString filename = QFileDialog::getOpenFileName(this, u8"选择打开的文件", ":", tr("*.*"));
 	std::replace(filename.begin(), filename.end(), QChar('/'), QChar('\\'));
 	qDebug() << "播放的媒体:" << filename;
-	m_qSqlData->insertData(filename);
 
+
+	if (filename!=nullptr)
+	{
+		m_qSqlData->insertData(filename);
+		QString justFileName = m_Utils->baseName(filename).arg(m_qListWidget->count() + 1);
+		QListWidgetItem *item = new QListWidgetItem(justFileName);
+		m_qListWidget->addItem(item);
+		item->setSelected(true);
+		emit onSignItemClick(m_Utils->baseName(filename));
+	}
 	
-	QString justFileName = m_Utils->baseName(filename).arg(m_qListWidget->count() + 1);
-	QListWidgetItem *item = new QListWidgetItem(justFileName);
-	m_qListWidget->addItem(item);
 	//item->setSelected(true);
 
 	//m_qListWidget->clear();
@@ -130,8 +160,8 @@ void CrightPlayListWidght::onItemClick(QListWidgetItem *item) {
 }
 void CrightPlayListWidght::resizeEvent(QResizeEvent* event) {
 	if (m_qListWidget && m_pSelectVideo) {
-		m_qListWidget->resize(this->width()-5, this->height()-40);
-		m_pSelectVideo->resize(this->width(),0);
+		m_qListWidget->resize(this->width()-10, this->height()-50);
+		//pHlay->resize(this->width(),0);
 	}
 
 }

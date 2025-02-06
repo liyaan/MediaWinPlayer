@@ -31,6 +31,7 @@ signals:
 	void onSignItemClick(QString name);
 private:
 	QPushButton* m_pSelectVideo = nullptr;
+	QPushButton* m_pClearVideo = nullptr;
 	CvlcPlayKits *m_Pvlc = nullptr;
 	QSqlData* m_qSqlData;
 	QListWidget* m_qListWidget;

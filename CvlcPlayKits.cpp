@@ -63,6 +63,7 @@ CvlcPlayKits::CvlcPlayKits()
 
 int CvlcPlayKits::initVLC() {
 	vlc_base = libvlc_new(0, nullptr);
+	cv::Mat mat;
 	if (vlc_base) {
 		vlc_mediaPlayer = libvlc_media_player_new(vlc_base);
 		if (vlc_mediaPlayer)
@@ -105,8 +106,11 @@ int CvlcPlayKits::play(QString filename, void *drawable) {
 
 	libvlc_media_release(vlc_media);
 	vlc_media = nullptr;
-	
-	if (vlc_mediaPlayer)libvlc_media_player_play(vlc_mediaPlayer);
+	if (vlc_mediaPlayer) {
+		//libvlc_video_set_callbacks(vlc_mediaPlayer, libvlc_video_lock_cb,nullptr, libvlc_video_display_cb, this);
+		//libvlc_video_set_format(vlc_mediaPlayer, "I420", 768, 432, 768 * 4);
+		libvlc_media_player_play(vlc_mediaPlayer);
+	}
 	setVideoPlayButtonContent(QStringLiteral("ÔÝÍ£"));
 	pause = false;
 	return 0;
@@ -255,4 +259,96 @@ CvlcPlayKits::~CvlcPlayKits()
 		libvlc_release(vlc_base);
 	}
 	vlc_base = nullptr;
+}
+QMutex Mutex;
+void *CvlcPlayKits::libvlc_video_lock_cb(void *opaque, void **planes) {
+	if (opaque && planes)
+	{
+		CvlcPlayKits *app = static_cast<CvlcPlayKits*>(opaque);
+		if (app)
+		{
+			static bool flag = true;
+			if (flag)
+			{
+				flag = false;
+				libvlc_video_get_size(app->media_player(), 0, &app->imageW, &app->imageH);
+				app->imageBuf = new unsigned char[app->imageW*app->imageH*4];
+				memset(app->imageBuf, 0, app->imageW * app->imageH * 4);
+			}
+			Mutex.lock();
+			*planes = app->imageBuf;
+			Mutex.unlock();
+		}
+	}
+	return nullptr;
+}
+void CvlcPlayKits::libvlc_video_display_cb(void *opaque, void *picture) {
+	if (opaque)
+	{
+		CvlcPlayKits *app = static_cast<CvlcPlayKits*>(opaque);
+		if (app)
+		{
+			Mutex.lock();
+			cv::Mat Mat(static_cast<int>(app->imageH), static_cast<int>(app->imageW), CV_8UC4, app->imageBuf);
+			Mutex.unlock();
+
+			if (!Mat.empty())
+			{
+				app->setMat(Mat);
+			}
+		}
+	}
+}
+void CvlcPlayKits::libvlc_video_unlock_cb(void *opaque, void *picture,
+	void *const *planes) {}
+
+void CvlcPlayKits::setMat(cv::Mat Mat)
+{
+
+	QImage srcImage = MatToQImage(Mat);
+	if (!srcImage.isNull())
+	{
+		emit sign_YsQPixmap(QPixmap::fromImage(srcImage));
+		//ui.src->setPixmap(QPixmap::fromImage(srcImage));
+	}
+	cv::Mat grayMat, dstMat;
+	cv::cvtColor(Mat, grayMat, CV_BGR2GRAY);
+	cv::applyColorMap(grayMat, dstMat, 9);
+	QImage dstImage = MatToQImage(dstMat);
+	if (!dstImage.isNull())
+	{
+		qDebug() << "signClYsQPixmap";
+		emit sign_ClYsQPixmap(QPixmap::fromImage(dstImage));
+		//ui.dst->setPixmap(QPixmap::fromImage(dstImage));
+	}
+}
+QImage CvlcPlayKits::MatToQImage(cv::Mat mtx)
+{
+	switch (mtx.type())
+	{
+	case CV_8UC1:
+	{
+		QImage img((const unsigned char *)(mtx.data), mtx.cols, mtx.rows, mtx.cols, QImage::Format_Grayscale8);
+		return img;
+	}
+	break;
+	case CV_8UC3:
+	{
+		QImage img((const unsigned char *)(mtx.data), mtx.cols, mtx.rows, mtx.cols * 3, QImage::Format_RGB888);
+		return img.rgbSwapped();
+	}
+	break;
+	case CV_8UC4:
+	{
+		QImage img((const unsigned char *)(mtx.data), mtx.cols, mtx.rows, mtx.cols * 4, QImage::Format_ARGB32);
+		return img;
+	}
+	break;
+	default:
+	{
+		QImage img;
+		return img;
+	}
+	break;
+	}
 }

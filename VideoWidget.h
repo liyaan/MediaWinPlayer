@@ -39,6 +39,9 @@ private slots:
 	void onRightItemClick(QString path);
 	void onLeftItemClick(QString path);
 	void signBottomClick(int);
+
+	void signYsQPixmap(QPixmap value);
+	void signClYsQPixmap(QPixmap value);
 private:
 	QWidget* m_pVideoWidget = nullptr;
 	QPushButton* m_pSelectVideo = nullptr;
@@ -53,6 +56,8 @@ private:
 	Utils* m_Utils = nullptr;
 	QListWidget* listWidght = nullptr;
 	CLiftRtmpListWidght* m_pCLiftRtmpListWidght = nullptr;
+	QLabel* m_QYImage = nullptr;
+	QLabel* m_QYcImage = nullptr;
 private slots:
 	
 signals:

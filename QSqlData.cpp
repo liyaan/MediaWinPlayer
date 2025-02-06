@@ -104,6 +104,20 @@ QStringList QSqlData::readDataList() {
 	}
 	return list;
 }
+bool QSqlData::clearDataList() {
+	if (!db.open()) {
+		qDebug() << "Could not open database";
+	}
+	QSqlQuery query("DELETE  FROM vlcLya");
+
+	if (!query.exec()) {
+		qDebug() << "readData readDataFile" << "Error: " << query.lastError().text();
+		qDebug() << "Query:" << query.lastQuery();
+		qDebug() << "Values:" << query.boundValues();
+		return false;
+	}
+	return true;
+}
 QSqlData::~QSqlData()
 {
 }

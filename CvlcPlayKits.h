@@ -5,6 +5,10 @@
 #include <QDir>
 #include <vector>
 #include <QDebug>
+#include "opencv2/opencv.hpp"
+#include <QMutex>
+#include <QImage>
+#include <QPixmap>
 using namespace std;
 class CvlcPlayKits : public QObject
 {
@@ -33,6 +37,14 @@ public:
 	bool getPasus();
 
 	vector<libvlc_time_t> getVecDuration();
+
+
+	static void *libvlc_video_lock_cb(void *opaque, void **planes);
+	static void libvlc_video_display_cb(void *opaque, void *picture);
+	static void libvlc_video_unlock_cb(void *opaque, void *picture,
+		void *const *planes);
+	void setMat(cv::Mat);
+	QImage MatToQImage(cv::Mat mtx);
 signals:
 	void sign_TimeSliderPos(const int& value);
 	void sign_VolumeSliderPos(const int& value);
@@ -41,6 +53,8 @@ signals:
 	
 	void sign_VideoTimeProgress(const float& value);
 
+	void sign_YsQPixmap(QPixmap value);
+	void sign_ClYsQPixmap(QPixmap value);
 private:
 	libvlc_instance_t *vlc_base = nullptr;
 	libvlc_media_t *vlc_media = nullptr;
@@ -54,4 +68,8 @@ private:
 
 	vector<libvlc_time_t> m_vecDurations;
 	int m_vecIndex = 0;
+
+public:
+	unsigned int imageW, imageH;
+	unsigned char *imageBuf = nullptr;
 };
