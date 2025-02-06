@@ -12,6 +12,7 @@ public:
 	QString baseName(QString fileName);
 	QString absolutePath(QString fileName);
 	QString getSelectPath();
+
 private:
 	QString selectPath = nullptr;
 };
